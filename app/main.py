@@ -47,5 +47,7 @@ def update_graph(ticker):
     return fig, dist, 'Timestamp: {}'.format(time)
 
 
+
+
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(port= ,debug=True)

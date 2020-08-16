@@ -34,7 +34,6 @@ Markdown==3.2.2
 MarkupSafe==1.1.1
 matplotlib==3.3.1
 multitasking==0.0.9
-ngboost==0.2.4.dev0
 numpy==1.18.5
 oauthlib==3.1.0
 opt-einsum==3.3.0
