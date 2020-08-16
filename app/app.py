@@ -27,6 +27,7 @@ app.layout = html.Div([
             ),
         ],
         style={'width': '48%', 'display': 'inline-block'}),
+    html.Div(id='timestamp'),
     html.Div([
         dcc.Graph(id='indicator-graphic')
         ]),
@@ -37,12 +38,13 @@ app.layout = html.Div([
 
 @app.callback(
     [Output('indicator-graphic', 'figure'),
-     Output('dist-graph', 'figure')],
+     Output('dist-graph', 'figure'),
+     Output(component_id='timestamp', component_property='children')],
     [Input('ticker', 'value')])
 def update_graph(ticker):
-    fig, dist = hf.runPrediction(ticker)
+    fig, dist, time = hf.runPrediction(ticker)
 
-    return fig, dist
+    return fig, dist, 'Timestamp: {}'.format(time)
 
 
 if __name__ == '__main__':

@@ -118,7 +118,7 @@ def scale(pred_data, seq_length):
             obs_pp = np.concatenate([price_obs, macd_obs,osc_obs,other_obs], axis=1)
             obs_pred.append(obs_pp)
             idxs.append([i,i+seq_length])
-            dts.append(obs.index[-1])
+            dts.append(obs.index.max())
 
     return obs_pred, idxs, dts
 
@@ -249,5 +249,6 @@ def runPrediction(tick, seq_length=128, lookback = '1d', interval='5m', tz = 'US
     print(dist)
     dist = plotNormal(dist[0], dist[1])
     graph = plotResults(results)
-    return graph, dist
+    last_time = results.index.max().strftime('%Y-%m-%d %H:%M:%S')
+    return graph, dist, last_time
 
