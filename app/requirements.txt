@@ -191,7 +191,7 @@ nbpresent==3.0.2
 nest-asyncio @ file:///home/conda/feedstock_root/build_artifacts/nest-asyncio_1588514211290/work
 networkx==2.4
 ngboost @ git+https://github.com/stanfordmlgroup/ngboost.git@3c4ff30035893da5e73954658ce3de9f5f29e7b4
-nltk==3.4.4
+nltk==3.4.5
 nose==1.3.7
 notebook @ file:///home/conda/feedstock_root/build_artifacts/notebook_1588887226267/work
 notebook-executor @ file:///opt/conda/conda-bld/dlenv-base_1593468110918/work/packages/notebook_executor
