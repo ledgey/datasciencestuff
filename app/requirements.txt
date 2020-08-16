@@ -34,6 +34,7 @@ Markdown==3.2.2
 MarkupSafe==1.1.1
 matplotlib==3.3.1
 multitasking==0.0.9
+ngboost @ git+https://github.com/stanfordmlgroup/ngboost.git@3c4ff30035893da5e73954658ce3de9f5f29e7b4
 numpy==1.18.5
 oauthlib==3.1.0
 opt-einsum==3.3.0
