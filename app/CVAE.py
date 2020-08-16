@@ -1,12 +1,8 @@
-import os
 import tensorflow as tf
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 from tensorflow.keras import backend as K
-from tensorflow.keras.losses import binary_crossentropy, mse
-from tensorflow.keras.utils import plot_model
-from scipy.stats import norm
-
+from tensorflow.keras.losses import binary_crossentropy
 # reparameterization trick
 # instead of sampling from Q(z|X), sample eps = N(0,I)
 # z = z_mean + sqrt(var)*eps
@@ -82,5 +78,4 @@ def build_cvae(z_dim = 8,
         cvae.add_loss(total_loss)
         cvae.compile(optimizer='rmsprop')
         return encoder, decoder, cvae
-    
-    def build_cvae()
+

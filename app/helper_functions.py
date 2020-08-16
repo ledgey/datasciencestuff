@@ -1,24 +1,18 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from tensorflow.keras.models import load_model
 import yfinance as yf
 import pickle
-from ngboost import NGBRegressor
 import plotly.graph_objects as go
 
-from flask import Flask, render_template
+import CVAE as cvae
 
 
-
-app = Flask(__name__)
-app.debug = True
-
-encoder = load_model('encoder.h5')
-decoder = load_model('decoder.h5')
-cvae = load_model('cvae.h5')
+encoder, _,_ =  cvae.build_cvae()
+encoder.load_weights('encoder.h5')
 ngb = pickle.load(open('ngboost.pkl', 'rb'))
+symbols = pd.read_csv('forex.csv')
+ticks = symbols.Symbol.tolist()
+
 
 def LagguerreRSI(data, gamma):
     # Create base data structures
@@ -48,6 +42,7 @@ def LagguerreRSI(data, gamma):
                 
     return out
 
+
 def calculate_k(df):
     close = df.Close
     highest_high = df.High.rolling(10).max()
@@ -55,14 +50,17 @@ def calculate_k(df):
     df['per_k_10'] = (close - lowest_low)/(highest_high-lowest_low)
     return df
 
+
 def calculate_d(df):
     df['per_d_10'] = df['per_k_10'].rolling(10).mean()
     return df
+
 
 def stoichastic_osc(df):
     df_new = calculate_k(df)
     df_new = calculate_d(df_new)
     return df_new
+
 
 def macd_signal(df):
     exp1 = df.Close.ewm(span=12, adjust=False).mean()
@@ -71,9 +69,11 @@ def macd_signal(df):
     df['macd_signal'] = df.macd.ewm(span=9, adjust=False).mean()
     return df
 
+
 def MinMax(x):
     xt = (x-min(x))/(max(x)-min(x))
     return xt.fillna(0)
+
 
 def getData(tick, lookback, interval, tz):
     ticker = yf.Ticker(tick)
@@ -82,6 +82,7 @@ def getData(tick, lookback, interval, tz):
     tmp = tmp[cols] 
     tmp.index = tmp.index.tz_convert(tz=tz)
     return tmp
+
 
 def transform(tmp):
     tmp['time'] = (tmp.index.hour*60 + tmp.index.minute) /1440
@@ -94,6 +95,7 @@ def transform(tmp):
     tmp['RSI_point8'] = tmp[['Close']].apply(LagguerreRSI, gamma = 0.8)
     price_cols = ['Open','High', 'Low', 'Close', 'sma',  'upper_bol', 'lower_bol']
     return tmp.dropna()
+
 
 def scale(pred_data, seq_length):
     price_cols = ['Open','High', 'Low', 'Close', 'sma',  'upper_bol', 'lower_bol']
@@ -119,6 +121,7 @@ def scale(pred_data, seq_length):
             dts.append(obs.index[-1])
 
     return obs_pred, idxs, dts
+
 
 def plotResults(results):
     fig = go.Figure()
@@ -213,16 +216,23 @@ def plotResults(results):
             anchor="free",
             side="right"
         ),
-        yaxis3=dict(
-            title="MACD",
-            overlaying='y',
-            anchor="free",
-            side="right"
-        ))
+        yaxis3={'title': "MACD", 'overlaying': 'y', 'anchor': "free", 'side': "right"})
+
+    return fig
 
 
+import plotly.figure_factory as ff
 
-    fig.show()
+
+def plotNormal(mu, sigma):
+    # Add histogram data
+    x1 = sigma * np.random.randn(1000) + mu
+
+    # Create distplot with custom bin_size
+    fig = ff.create_distplot([x1],group_labels=['Slope'],bin_size=.5,
+                         curve_type='normal', show_hist=False)
+    return fig
+
 
 def runPrediction(tick, seq_length=128, lookback = '1d', interval='5m', tz = 'US/Eastern'):
     df = getData(tick, lookback, interval, tz)
@@ -235,11 +245,9 @@ def runPrediction(tick, seq_length=128, lookback = '1d', interval='5m', tz = 'US
     gbpyn = pd.DataFrame(predDict)
     gbpyn.index = pd.DatetimeIndex(gbpyn['times'])
     results = df.join(gbpyn)
-    plotResults(results)
-    
-@app.route('/')
-def index():
-    return render_template('index.html')
-    
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9999)
+    dist = results[['pred', 'prob']].iloc[-2].values
+    print(dist)
+    dist = plotNormal(dist[0], dist[1])
+    graph = plotResults(results)
+    return graph, dist
+
