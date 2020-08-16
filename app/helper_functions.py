@@ -105,7 +105,7 @@ def scale(pred_data, seq_length):
     idxs = []
     dts = []
     obs_pred = []
-    for i in range(len(pred_data)-(seq_length)):
+    for i in range(len(pred_data)-(seq_length)+1):
         obs = pred_data.iloc[i:i+seq_length]
         if len(obs) == seq_length:
             price_obs = obs[price_cols].values
@@ -194,7 +194,8 @@ def plotResults(results):
                     close=results['Close']))
 
     fig.update_layout(
-
+        title='Trace',
+        xaxis_rangeslider_visible=False,
         yaxis=dict(
             title="yaxis title",
             titlefont=dict(
@@ -230,7 +231,19 @@ def plotNormal(mu, sigma):
 
     # Create distplot with custom bin_size
     fig = ff.create_distplot([x1],group_labels=['Slope'],bin_size=.5,
-                         curve_type='normal', show_hist=False)
+                         curve_type='normal', show_hist=False,show_rug=False)
+    fig.add_shape(
+        type="line",
+        yref="paper",
+        x0=0,
+        y0=0,
+        x1=0,
+        y1=1,
+        line=dict(
+            color="DarkOrange",
+            width=3,
+        ),
+    )
     return fig
 
 
@@ -245,8 +258,9 @@ def runPrediction(tick, seq_length=128, lookback = '1d', interval='5m', tz = 'US
     gbpyn = pd.DataFrame(predDict)
     gbpyn.index = pd.DatetimeIndex(gbpyn['times'])
     results = df.join(gbpyn)
-    dist = results[['pred', 'prob']].iloc[-2].values
-    print(dist)
+    print(results.tail(5))
+    dist = results[['pred', 'prob']].iloc[-1].values
+    # print(dist)
     dist = plotNormal(dist[0], dist[1])
     graph = plotResults(results)
     last_time = results.index.max().strftime('%Y-%m-%d %H:%M:%S')

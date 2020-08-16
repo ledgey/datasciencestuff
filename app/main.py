@@ -26,14 +26,16 @@ app.layout = html.Div([
                 value='EURUSD=X'
             ),
         ],
-        style={'width': '48%', 'display': 'inline-block'}),
-    html.Div(id='timestamp'),
-    html.Div([
-        dcc.Graph(id='indicator-graphic')
-        ]),
-    html.Div([
-        dcc.Graph(id='dist-graph')
-    ])
+        style={'width': '30%', 'display': 'inline-block'}),
+            html.Div(id='timestamp'),
+                html.Div([
+                    html.Div([
+                        dcc.Graph(id='indicator-graphic')],
+                        className="eight columns"),
+                html.Div([
+                        dcc.Graph(id='dist-graph')],
+                        className="four columns")],
+                className="row")
 ])
 
 @app.callback(
