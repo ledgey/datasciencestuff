@@ -262,7 +262,7 @@ def runPrediction(tick, seq_length=128, lookback = '1d', interval='5m', tz = 'US
     dist = results[['pred', 'prob']].iloc[-1].values
     # print(dist)
     dist = plotNormal(dist[0], dist[1])
-    graph = plotResults(results)
+    graph = plotResults(results.dropna())
     last_time = results.index.max().strftime('%Y-%m-%d %H:%M:%S')
     return graph, dist, last_time
 
